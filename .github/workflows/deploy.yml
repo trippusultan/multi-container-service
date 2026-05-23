@@ -9,7 +9,8 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: your-dockerhub-username/multi-container-todo-api
+  # Override per-user: trippusultan/multi-container-todo-api
+  IMAGE_NAME: ${{ github.repository_owner }}/multi-container-todo-api
 
 jobs:
   lint-and-test:
@@ -46,11 +47,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint-and-test
 
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    permissions:
-      contents: read
-      packages: write
+    # Only build if deployed to main AND Docker Hub credentials exist
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      secrets.DOCKERHUB_USERNAME != '' &&
+      secrets.DOCKERHUB_TOKEN != ''
 
     steps:
       - name: Checkout repository
@@ -79,7 +81,12 @@ jobs:
     name: 🚀 Deploy to Server
     runs-on: ubuntu-latest
     needs: build-and-push
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      secrets.SERVER_HOST != '' &&
+      secrets.SERVER_SSH_KEY != ''
 
     steps:
       - name: Checkout repository
@@ -109,19 +116,14 @@ jobs:
 
             # Ensure Docker Compose is available
             if ! command -v docker compose &>/dev/null; then
-              echo "docker compose plugin not found; installing..."
-              DOCKER_COMPOSE_VERSION=2.29.0
-              curl -fsSL "https://github.com/docker/compose/releases/download/v${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" \
+              echo "docker compose plugin not found; installing fallback..."
+              curl -fsSL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
                 -o /usr/local/bin/docker-compose
               chmod +x /usr/local/bin/docker-compose
             fi
 
-            # Pull fresh image and restart
-            IMAGE="${REGISTRY}/${IMAGE_NAME}:${GITHUB_SHA}"
-            docker compose pull todo-api || true
-            docker compose up -d todo-api --remove-orphans
-
-            # Restart app dependency chain if mongo is used
+            # Pull fresh images and restart
+            docker compose pull || true
             docker compose up -d --remove-orphans
 
             echo "✅ Deployment complete"

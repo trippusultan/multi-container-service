@@ -1,0 +1,5 @@
+[todo-api]
+your_droplet_ip_here ansible_user=root
+
+[todo-api:vars]
+ansible_ssh_private_key_file = ~/.ssh/your_do_key

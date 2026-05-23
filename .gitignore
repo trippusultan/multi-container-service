@@ -1,0 +1,25 @@
+# Ignore everything
+/*
+# Track project-specific files only
+!/.github/
+!/.github/workflows/
+!/ansible/
+!/nginx/
+!/src/
+!/terraform/
+!.dockerignore
+!.gitignore
+!docker-compose.yml
+!Dockerfile
+!package.json
+!package-lock.json
+!README.md
+
+# Ignore workspace-level noise
+!.wdm/
+!.vscode/
+!.idea/
+!.DS_Store
+!.env
+!node_modules/
+!coverage/

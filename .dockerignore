@@ -1,0 +1,22 @@
+# Ignore these files when copying build context to Docker daemon
+node_modules
+.env
+.git
+.gitignore
+.travis.yml
+docker-compose*.yml
+Dockerfile
+tests
+ansible
+terraform
+.github
+README.md
+LICENSE
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+coverage
+.nyc_output
+__pycache__

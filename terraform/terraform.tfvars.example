@@ -1,0 +1,6 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# NEVER commit terraform.tfvars — it contains secrets.
+
+do_token   = "your_digitalocean_api_token"
+ssh_key_name = "your_ssh_key_name_in_do"
+server_name   = "todo-api-server"
